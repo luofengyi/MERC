@@ -139,7 +139,8 @@ class Coach:
             for k, v in data.items():
                 if not k == "utterance_texts":
                     data[k] = v.to(self.args.device)
-            nll = self.model.get_loss(data,True) + 0.05*encoderL.to(self.args.device)
+            mf_loss_weight = getattr(self.args, "mf_loss_weight", 0.05)
+            nll = self.model.get_loss(data,True) + mf_loss_weight * encoderL.to(self.args.device)
             epoch_loss += nll.item()
             nll.backward()
             self.opt1.step()

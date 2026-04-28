@@ -164,6 +164,24 @@ if __name__ == "__main__":
     parser.add_argument("--drop_rate", type=float, default=0.3, help="Dropout rate.")
 
     parser.add_argument("--cl_loss_weight", type=float, default=0.2)
+    parser.add_argument("--mf_loss_weight", type=float, default=0.05)
+    parser.add_argument("--disable_gcl", action="store_true", default=False)
+    parser.add_argument(
+        "--augment_view1",
+        type=str,
+        default="fm+ep",
+        choices=["none", "fm", "ep", "gp", "fm+ep", "fm+gp", "ep+gp"],
+    )
+    parser.add_argument(
+        "--augment_view2",
+        type=str,
+        default="fm+gp",
+        choices=["none", "fm", "ep", "gp", "fm+ep", "fm+gp", "ep+gp"],
+    )
+    parser.add_argument("--fm_drop_rate", type=float, default=0.25)
+    parser.add_argument("--ep_perturb_rate", type=float, default=0.10)
+    parser.add_argument("--gp_topk", type=int, default=3)
+    parser.add_argument("--cl_tau", type=float, default=0.2)
 
     parser.add_argument(
         "--max_grad_value",
