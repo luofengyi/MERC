@@ -28,7 +28,13 @@ def run_cmd(cmd, cwd):
     if proc.returncode != 0:
         print(proc.stdout)
         print(proc.stderr)
-        raise RuntimeError(f"Command failed: {' '.join(cmd)}")
+        tail = (proc.stderr or proc.stdout or "").strip()
+        if len(tail) > 3000:
+            tail = tail[-3000:]
+        raise RuntimeError(
+            f"Command failed (code={proc.returncode}): {' '.join(cmd)}\n"
+            f"--- subprocess tail ---\n{tail}"
+        )
     return proc.stdout
 
 

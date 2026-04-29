@@ -76,7 +76,7 @@ def main(args):
     data = joyful.utils.load_pkl(args.data)
     log.info("Loaded data.")
 
-    modelF = AutoFusion(1380)
+    modelF = AutoFusion(1380).to(args.device)
 
     trainset = joyful.Dataset(data["train"], modelF, True, args)
     devset = joyful.Dataset(data["dev"], modelF, False, args)
