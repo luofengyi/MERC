@@ -12,10 +12,9 @@ torch.cuda.manual_seed(24)
 def sim(h1, h2):
     z1 = nn.functional.normalize(h1, dim=-1, p=2)
     z2 = nn.functional.normalize(h2, dim=-1, p=2)
-    contrast_model = DualBranchContrast(
-        loss=L.InfoNCE(tau=0.2), mode='L2L', intraview_negs=True
-    ).to(h1.device)
-    loss = contrast_model(z1, z2)
+
+    contrast_model = DualBranchContrast(loss=L.InfoNCE(tau=0.2), mode='L2L', intraview_negs=True).to('cuda:0')
+    loss = contrast_model(z1,z2)
     return loss
 
 def contrastive_loss_wo_cross_network(h1, h2, ho):
@@ -23,24 +22,16 @@ def contrastive_loss_wo_cross_network(h1, h2, ho):
     intra2 = sim(ho, h2)
     return intra1+intra2
 
-def random_feature_mask(input_feature, drop_percent, device=None):
-    if device is None:
-        device = input_feature.device
-    p = torch.ones(input_feature.shape, dtype=torch.float, device=device).bernoulli_(
-        1 - drop_percent
-    )
+def random_feature_mask(input_feature, drop_percent, device=torch.device('cuda:0')):
+    p = torch.ones(input_feature.shape,dtype=torch.float).bernoulli_(1-drop_percent).to(device)
     aug_feature = input_feature * p
     return aug_feature
 
-def random_edge_pert(edge_index, num_nodes, pert_percent, device=None):
-    if device is None:
-        device = edge_index.device
+def random_edge_pert(edge_index, num_nodes, pert_percent, device=torch.device('cuda:0')):
     num_edges = edge_index.shape[1]
     pert_num_edges = int(num_edges*pert_percent)
     pert_idxs = np.random.choice(num_edges, pert_num_edges, replace=False)
-    edge_index[1, pert_idxs] = torch.as_tensor(
-        np.random.randint(0, num_nodes, pert_num_edges), dtype=torch.long, device=device
-    )
+    edge_index[1, pert_idxs] = torch.LongTensor(np.random.randint(0, num_nodes, pert_num_edges)).to(device)
     return edge_index
 
 

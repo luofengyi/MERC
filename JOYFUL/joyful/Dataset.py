@@ -22,7 +22,6 @@ class Dataset:
             self.modelF.eval()
 
         self.embedding_dim = args.dataset_embedding_dims[args.dataset][args.modalities]
-        self.modelF_device = next(self.modelF.parameters()).device
 
     def __len__(self):
         return self.num_batches
@@ -52,36 +51,36 @@ class Dataset:
             tmp = []
             losst = 0
             for t, a, v in zip(s.sbert_sentence_embeddings, s.audio, s.visual):
-                t = torch.tensor(t, dtype=torch.float32, device=self.modelF_device)
-                a = torch.tensor(a, dtype=torch.float32, device=self.modelF_device)
-                v = torch.tensor(v, dtype=torch.float32, device=self.modelF_device)
+                t = torch.tensor(t, dtype=torch.float32)
+                a = torch.tensor(a, dtype=torch.float32)
+                v = torch.tensor(v, dtype=torch.float32)
                 if self.modalities == "atv":
                     output, loss = self.modelF(a, t, v)
-                    tmp.append(output.detach().cpu())
+                    tmp.append(output)
                     losst += loss
                 elif self.modalities == "at":
                     output, loss = self.modelF(a, t)
-                    tmp.append(output.detach().cpu())
+                    tmp.append(output)
                     losst += loss
                 elif self.modalities == "tv":
                     output, loss = self.modelF(t, v)
-                    tmp.append(output.detach().cpu())
+                    tmp.append(output)
                     losst += loss
                 elif self.modalities == "av":
                     output, loss = self.modelF(a, v)
-                    tmp.append(output.detach().cpu())
+                    tmp.append(output)
                     losst += loss
                 elif self.modalities == "a":
                     output, loss = self.modelF(a)
-                    tmp.append(output.squeeze(0).detach().cpu())
+                    tmp.append(output.squeeze(0))
                     losst += loss
                 elif self.modalities == "t":
                     output, loss = self.modelF(t)
-                    tmp.append(output.squeeze(0).detach().cpu())
+                    tmp.append(output.squeeze(0))
                     losst += loss
                 elif self.modalities == "v":
                     output, loss = self.modelF(v)
-                    tmp.append(output.squeeze(0).detach().cpu())
+                    tmp.append(output.squeeze(0))
                     losst += loss
 
             tmp = torch.stack(tmp)

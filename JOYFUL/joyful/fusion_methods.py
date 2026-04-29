@@ -42,7 +42,7 @@ class AutoFusion(nn.Module):
         )
 
     def forward(self, a, t, v):
-        B = self.projectB(torch.ones(460, device=a.device))
+        B = self.projectB(torch.ones(460))
         A = self.projectA(a)
         T = self.projectT(t)
         V = self.projectV(v)
